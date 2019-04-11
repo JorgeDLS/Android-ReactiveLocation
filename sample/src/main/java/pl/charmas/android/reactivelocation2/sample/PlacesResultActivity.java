@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBuffer;
-
+import com.google.android.libraries.places.api.model.Place;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import pl.charmas.android.reactivelocation2.ReactiveLocationProvider;
@@ -59,19 +57,19 @@ public class PlacesResultActivity extends BaseActivity {
     @Override
     protected void onLocationPermissionGranted() {
         compositeSubscription = new CompositeDisposable();
-        compositeSubscription.add(reactiveLocationProvider.getPlaceById(placeId)
-                .subscribe(new Consumer<PlaceBuffer>() {
-                    @Override
-                    public void accept(PlaceBuffer buffer) {
-                        Place place = buffer.get(0);
-                        if (place != null) {
-                            placeNameView.setText(place.getName());
-                            placeLocationView.setText(place.getLatLng().latitude + ", " + place.getLatLng().longitude);
-                            placeAddressView.setText(place.getAddress());
-                        }
-                        buffer.release();
-                    }
-                }));
+        //compositeSubscription.add(reactiveLocationProvider.getPlaceById(placeId)
+        //        .subscribe(new Consumer<PlaceBuffer>() {
+        //            @Override
+        //            public void accept(PlaceBuffer buffer) {
+        //                Place place = buffer.get(0);
+        //                if (place != null) {
+        //                    placeNameView.setText(place.getName());
+        //                    placeLocationView.setText(place.getLatLng().latitude + ", " + place.getLatLng().longitude);
+        //                    placeAddressView.setText(place.getAddress());
+        //                }
+        //                buffer.release();
+        //            }
+        //        }));
     }
 
     @Override

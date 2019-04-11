@@ -9,10 +9,9 @@ def getGooglePlayServicesApiKey() {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionName project.VERSION_NAME
         versionCode Integer.parseInt(project.VERSION_CODE)

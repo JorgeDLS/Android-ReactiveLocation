@@ -1,5 +1,6 @@
 package pl.charmas.android.reactivelocation2.sample;
 
+import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,10 +12,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.location.places.AutocompletePrediction;
-import com.google.android.gms.location.places.AutocompletePredictionBuffer;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
@@ -62,24 +59,24 @@ public class PlacesActivity extends BaseActivity {
     @Override
     protected void onLocationPermissionGranted() {
         compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(
-                reactiveLocationProvider.getCurrentPlace(null)
-                        .subscribe(new Consumer<PlaceLikelihoodBuffer>() {
-                            @Override
-                            public void accept(PlaceLikelihoodBuffer buffer) {
-                                PlaceLikelihood likelihood = buffer.get(0);
-                                if (likelihood != null) {
-                                    currentPlaceView.setText(likelihood.getPlace().getName());
-                                }
-                                buffer.release();
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Log.e("PlacesActivity", "Error in observable", throwable);
-                            }
-                        })
-        );
+        //compositeDisposable.add(
+        //        reactiveLocationProvider.getCurrentPlace(null)
+        //                .subscribe(new Consumer<PlaceLikelihoodBuffer>() {
+        //                    @Override
+        //                    public void accept(PlaceLikelihoodBuffer buffer) {
+        //                        PlaceLikelihood likelihood = buffer.get(0);
+        //                        if (likelihood != null) {
+        //                            currentPlaceView.setText(likelihood.getPlace().getName());
+        //                        }
+        //                        buffer.release();
+        //                    }
+        //                }, new Consumer<Throwable>() {
+        //                    @Override
+        //                    public void accept(Throwable throwable) throws Exception {
+        //                        Log.e("PlacesActivity", "Error in observable", throwable);
+        //                    }
+        //                })
+        //);
 
         Observable<String> queryObservable = RxTextView
                 .textChanges(queryView)
@@ -96,40 +93,40 @@ public class PlacesActivity extends BaseActivity {
                         return !TextUtils.isEmpty(s);
                     }
                 });
-        Observable<Location> lastKnownLocationObservable = reactiveLocationProvider.getLastKnownLocation();
-        Observable<AutocompletePredictionBuffer> suggestionsObservable = Observable
-                .combineLatest(queryObservable, lastKnownLocationObservable,
-                        new BiFunction<String, Location, QueryWithCurrentLocation>() {
-                            @Override
-                            public QueryWithCurrentLocation apply(String query, Location currentLocation) {
-                                return new QueryWithCurrentLocation(query, currentLocation);
-                            }
-                        }).flatMap(new Function<QueryWithCurrentLocation, Observable<AutocompletePredictionBuffer>>() {
-                    @Override
-                    public Observable<AutocompletePredictionBuffer> apply(QueryWithCurrentLocation q) {
-                        if (q.location == null) return Observable.empty();
+        @SuppressLint("MissingPermission") Observable<Location> lastKnownLocationObservable = reactiveLocationProvider.getLastKnownLocation();
+        //Observable<AutocompletePredictionBuffer> suggestionsObservable = Observable
+        //        .combineLatest(queryObservable, lastKnownLocationObservable,
+        //                new BiFunction<String, Location, QueryWithCurrentLocation>() {
+        //                    @Override
+        //                    public QueryWithCurrentLocation apply(String query, Location currentLocation) {
+        //                        return new QueryWithCurrentLocation(query, currentLocation);
+        //                    }
+        //                }).flatMap(new Function<QueryWithCurrentLocation, Observable<AutocompletePredictionBuffer>>() {
+        //            @Override
+        //            public Observable<AutocompletePredictionBuffer> apply(QueryWithCurrentLocation q) {
+        //                if (q.location == null) return Observable.empty();
+        //
+        //                double latitude = q.location.getLatitude();
+        //                double longitude = q.location.getLongitude();
+        //                LatLngBounds bounds = new LatLngBounds(
+        //                        new LatLng(latitude - 0.05, longitude - 0.05),
+        //                        new LatLng(latitude + 0.05, longitude + 0.05)
+        //                );
+        //                return reactiveLocationProvider.getPlaceAutocompletePredictions(q.query, bounds, null);
+        //            }
+        //        });
 
-                        double latitude = q.location.getLatitude();
-                        double longitude = q.location.getLongitude();
-                        LatLngBounds bounds = new LatLngBounds(
-                                new LatLng(latitude - 0.05, longitude - 0.05),
-                                new LatLng(latitude + 0.05, longitude + 0.05)
-                        );
-                        return reactiveLocationProvider.getPlaceAutocompletePredictions(q.query, bounds, null);
-                    }
-                });
-
-        compositeDisposable.add(suggestionsObservable.subscribe(new Consumer<AutocompletePredictionBuffer>() {
-            @Override
-            public void accept(AutocompletePredictionBuffer buffer) {
-                List<AutocompleteInfo> infos = new ArrayList<>();
-                for (AutocompletePrediction prediction : buffer) {
-                    infos.add(new AutocompleteInfo(prediction.getFullText(null).toString(), prediction.getPlaceId()));
-                }
-                buffer.release();
-                placeSuggestionsList.setAdapter(new ArrayAdapter<>(PlacesActivity.this, android.R.layout.simple_list_item_1, infos));
-            }
-        }));
+        //compositeDisposable.add(suggestionsObservable.subscribe(new Consumer<AutocompletePredictionBuffer>() {
+        //    @Override
+        //    public void accept(AutocompletePredictionBuffer buffer) {
+        //        List<AutocompleteInfo> infos = new ArrayList<>();
+        //        for (AutocompletePrediction prediction : buffer) {
+        //            infos.add(new AutocompleteInfo(prediction.getFullText(null).toString(), prediction.getPlaceId()));
+        //        }
+        //        buffer.release();
+        //        placeSuggestionsList.setAdapter(new ArrayAdapter<>(PlacesActivity.this, android.R.layout.simple_list_item_1, infos));
+        //    }
+        //}));
     }
 
     @Override
